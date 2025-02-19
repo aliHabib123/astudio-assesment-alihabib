@@ -19,7 +19,8 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
@@ -45,5 +46,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the user's full name.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Get the projects that the user is assigned to.
+     */
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class)
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the timesheets for the user.
+     */
+    public function timesheets()
+    {
+        return $this->hasMany(Timesheet::class);
     }
 }
