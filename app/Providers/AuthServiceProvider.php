@@ -21,6 +21,13 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Passport::hashClientSecrets();
+        Passport::loadKeysFrom(storage_path('oauth-keys'));
+
+        Passport::tokensCan([
+            'register' => 'Register new users',
+        ]);
+
         Passport::tokensExpireIn(now()->addDays(15));
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
