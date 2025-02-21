@@ -288,6 +288,196 @@ Response: 200 OK
 }
 ```
 
+### Attributes Management (Client Credentials Required)
+
+#### List Attributes
+```
+GET /api/attributes
+Authorization: Bearer {client-token}
+
+Response: 200 OK
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "First Name",
+            "key": "first_name",
+            "type": "text",
+            "options": null,
+            "default_value": null,
+            "description": "User's first name",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        }
+    ],
+    "links": {
+        "first": "http://example.com/api/attributes?page=1",
+        "last": "http://example.com/api/attributes?page=1",
+        "prev": null,
+        "next": null
+    },
+    "meta": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 15,
+        "total": 1
+    }
+}
+
+Error Response: 401 Unauthorized
+{
+    "message": "Unauthenticated."
+}
+```
+
+#### Get Single Attribute
+```
+GET /api/attributes/{id}
+Authorization: Bearer {client-token}
+
+Response: 200 OK
+{
+    "data": {
+        "id": 1,
+        "name": "First Name",
+        "key": "first_name",
+        "type": "text",
+        "options": null,
+        "default_value": null,
+        "description": "User's first name",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 404 Not Found
+{
+    "message": "No query results for model [App\\Models\\Attribute]."
+}
+```
+
+#### Create Attribute
+```
+POST /api/attributes
+Authorization: Bearer {client-token}
+Content-Type: application/json
+
+{
+    "name": "First Name",
+    "key": "first_name",
+    "type": "text",
+    "options": ["option1", "option2"],  // Required only for type="select"
+    "default_value": "John",
+    "description": "User's first name"
+}
+
+Response: 201 Created
+{
+    "data": {
+        "id": 1,
+        "name": "First Name",
+        "key": "first_name",
+        "type": "text",
+        "options": null,
+        "default_value": "John",
+        "description": "User's first name",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 422 Unprocessable Entity
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "name": [
+            "The name field is required."
+        ],
+        "key": [
+            "The key has already been taken."
+        ],
+        "type": [
+            "The selected type is invalid."
+        ]
+    }
+}
+```
+
+#### Update Attribute
+```
+PUT /api/attributes/{id}
+Authorization: Bearer {client-token}
+Content-Type: application/json
+
+{
+    "name": "Updated First Name",
+    "key": "updated_first_name",
+    "type": "text",
+    "options": ["option1", "option2"],  // Required only for type="select"
+    "default_value": "Jane",
+    "description": "Updated description"
+}
+
+Response: 200 OK
+{
+    "data": {
+        "id": 1,
+        "name": "Updated First Name",
+        "key": "updated_first_name",
+        "type": "text",
+        "options": null,
+        "default_value": "Jane",
+        "description": "Updated description",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 422 Unprocessable Entity
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "key": [
+            "The key has already been taken."
+        ]
+    }
+}
+```
+
+#### Delete Attribute
+```
+DELETE /api/attributes/{id}
+Authorization: Bearer {client-token}
+
+Response: 200 OK
+{
+    "message": "Attribute deleted successfully",
+    "data": {
+        "id": 1,
+        "name": "First Name",
+        "key": "first_name",
+        "type": "text",
+        "options": null,
+        "default_value": null,
+        "description": "User's first name",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 404 Not Found
+{
+    "message": "No query results for model [App\\Models\\Attribute]."
+}
+```
+
+#### Attribute Types
+The following types are supported for attributes:
+- `text`: For text/string input
+- `date`: For date input
+- `number`: For numeric input
+- `select`: For dropdown selection (requires options array)
+
 ## Authentication Types
 
 ### Client Credentials (Service Token)
