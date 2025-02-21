@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Timesheet;
+use App\Policies\TimesheetPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        //
+        Timesheet::class => TimesheetPolicy::class,
     ];
 
     /**

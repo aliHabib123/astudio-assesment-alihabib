@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AttributeController;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\TimesheetController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,9 @@ Route::middleware('auth:api')->group(function () {
 
     // Project routes
     Route::apiResource('projects', ProjectController::class);
+
+    // Timesheet routes
+    Route::apiResource('timesheets', TimesheetController::class);
 });
 
 // Client credentials protected routes
