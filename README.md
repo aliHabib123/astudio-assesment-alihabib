@@ -75,14 +75,41 @@ php artisan db:seed
 This will create:
 - Default project statuses (New, In Progress, Completed, On Hold)
 - Sample attributes (Department, Start Date, End Date, User Role)
-- 10 random users
-- A test user (email: test@example.com)
+- A test user (email: test@example.com, password: password)
 - 10 sample projects with random attributes
 
 9. Start the development server:
 ```bash
 php artisan serve
 ```
+
+## Postman Setup
+
+### Update Collection Variables
+After running the setup script (`setup-passport.sh`), you need to update your Postman collection variables:
+
+1. Open your Postman collection
+2. Go to the "Variables" tab
+3. Find these variables and update them with values from your `.env` file:
+   - `PASSPORT_PASSWORD_GRANT_CLIENT_ID`
+   - `PASSPORT_PASSWORD_GRANT_CLIENT_SECRET`
+
+These credentials are required for authentication endpoints to work properly. You can find these values in your `.env` file after running the `setup-passport.sh` script.
+
+### Automated Token Handling
+The Postman collection includes automated scripts for token management:
+
+1. When calling `/oauth/token` (Password Grant):
+   - The access token is automatically extracted from the response
+   - Stored in the collection variable `access_token`
+   - Used for subsequent authenticated requests
+
+2. When calling `/api/login` (User Login):
+   - The user token is automatically extracted from the response
+   - Stored in the collection variable `access_token`
+   - Used for subsequent authenticated requests
+
+This automation means you don't need to manually copy and paste tokens between requests - just execute the authentication endpoints and the tokens will be automatically set for the entire collection.
 
 ## Verifying Installation
 
@@ -661,7 +688,7 @@ The following types are supported for attributes:
 
 ## Filtering
 
-The API supports filtering on both regular fields and EAV (Entity-Attribute-Value) attributes. You can apply filters using query parameters in the following format:
+The API supports dynamic filtering on both regular database fields and Entity-Attribute-Value (EAV) attributes. Filters can be applied using query parameters:
 
 ```
 GET /api/projects?filters[field:operator]=value
@@ -677,98 +704,57 @@ GET /api/projects?filters[field:operator]=value
 - `like` - Contains (case-insensitive)
 - `not` - Not equal to
 
-### Examples
-
-1. Basic equality filter:
-```
-GET /api/projects?filters[name]=ProjectA
-```
-
-2. Using LIKE operator:
-```
-GET /api/projects?filters[name:like]=Project
-```
-
-3. Multiple filters:
-```
-GET /api/projects?filters[name]=ProjectA&filters[department]=IT
-```
-
-4. Date range filter:
-```
-GET /api/projects?filters[start_date:gte]=2024-01-01&filters[end_date:lte]=2024-12-31
-```
-
 ### Filterable Fields
 
-#### Regular Fields
-- name
-- status_id
-- created_at
-- updated_at
-- deleted_at
-
-#### EAV Attributes
-- department
-- priority
-- client
-- budget
-
-## Advanced Filtering System
-
-The API supports filtering both regular database fields and Entity-Attribute-Value (EAV) attributes:
-
-#### Regular Fields
-- `name`
-- `status_id`
-- `created_at`
-- `updated_at`
-- `deleted_at`
+#### Regular Database Fields
+- `name` - Project name
+- `status_id` - Project status
+- `created_at` - Creation date
+- `updated_at` - Last update date
+- `deleted_at` - Deletion date (for soft deletes)
 
 #### Dynamic EAV Attributes
-Filters are dynamically loaded from the attributes table based on the attribute `key`. Common examples include:
-- `department`
-- `start_date`
-- `end_date`
-- `user_role`
+Any attribute defined in the system can be used as a filter using its `key`. Common examples include:
+- `department` - Department name
+- `start_date` - Project start date
+- `end_date` - Project end date
+- `user_role` - User role in project
+- `priority` - Project priority
+- `client` - Client name
+- `budget` - Project budget
 
-### Filter Operators
+### Usage Examples
 
-The following operators are supported for all filters:
-- `eq` (equals, default if not specified)
-- `gt` (greater than)
-- `lt` (less than)
-- `gte` (greater than or equal)
-- `lte` (less than or equal)
-- `like` (contains)
-- `not` (not equal)
-
-## Usage Examples
-
-### Basic Filtering
+1. Basic filtering:
 ```http
 GET /api/projects?filters[name]=Project Alpha
 GET /api/projects?filters[department]=Marketing
 ```
 
-### Using Operators
+2. Using operators:
 ```http
 GET /api/projects?filters[created_at:gt]=2024-01-01
 GET /api/projects?filters[name:like]=Alpha
 GET /api/projects?filters[department:not]=Sales
 ```
 
-### Multiple Filters
+3. Multiple filters:
 ```http
 GET /api/projects?filters[department]=Marketing&filters[start_date:gt]=2024-01-01
 ```
 
-## Implementation Details
+4. Date range filtering:
+```http
+GET /api/projects?filters[start_date:gte]=2024-01-01&filters[end_date:lte]=2024-12-31
+```
 
-The filtering system uses a combination of regular database columns and EAV pattern:
+### Implementation Details
+
+The filtering system combines regular database queries and EAV pattern:
 - Regular fields are filtered directly on the projects table
-- EAV attributes are filtered through a subquery joining attributes and attribute_values tables
-- Attribute keys are used for filtering instead of display names for consistency
+- EAV attributes are filtered through a subquery joining the attributes and attribute_values tables
+- Attribute keys (not display names) are used for filtering to ensure consistency
+- All filters are automatically validated against their defined attribute types
 
 ## Projects Management (User Token Required)
 
