@@ -10,31 +10,38 @@ fi
 
 # Create a personal access client
 echo "Creating personal access client..."
-PERSONAL_CLIENT=$(php artisan passport:client --personal --no-interaction --quiet)
-if [ $? -ne 0 ]; then
-    echo "Error creating personal access client"
-    exit 1
-fi
+PERSONAL_CLIENT=$(php artisan passport:client --personal --no-interaction)
+echo "Personal client output:"
+echo "$PERSONAL_CLIENT"
 
 # Extract client ID and secret using sed instead of grep -P
-PERSONAL_CLIENT_ID=$(echo "$PERSONAL_CLIENT" | sed -n 's/.*Client ID: \([0-9]*\).*/\1/p')
-PERSONAL_CLIENT_SECRET=$(echo "$PERSONAL_CLIENT" | sed -n 's/.*Client secret: \(.*\)/\1/p')
+PERSONAL_CLIENT_ID=$(echo "$PERSONAL_CLIENT" | sed -n 's/.*Client ID[. ]*\([0-9][0-9]*\)[. ]*/\1/p' | tr -d ' ')
+PERSONAL_CLIENT_SECRET=$(echo "$PERSONAL_CLIENT" | sed -n 's/.*Client secret[. ]*\([a-zA-Z0-9]*\)[. ]*/\1/p' | tr -d ' ')
+
+echo "Extracted personal client ID: $PERSONAL_CLIENT_ID"
+echo "Extracted personal client secret: $PERSONAL_CLIENT_SECRET"
 
 # Create password grant client
 echo "Creating password grant client..."
-PASSWORD_CLIENT=$(php artisan passport:client --password --name="Password Grant Client" --no-interaction --quiet)
-if [ $? -ne 0 ]; then
-    echo "Error creating password grant client"
-    exit 1
-fi
+PASSWORD_CLIENT=$(php artisan passport:client --password --name="Password Grant Client" --no-interaction)
+echo "Password client output:"
+echo "$PASSWORD_CLIENT"
 
 # Extract password client ID and secret
-PASSWORD_CLIENT_ID=$(echo "$PASSWORD_CLIENT" | sed -n 's/.*Client ID: \([0-9]*\).*/\1/p')
-PASSWORD_CLIENT_SECRET=$(echo "$PASSWORD_CLIENT" | sed -n 's/.*Client secret: \(.*\)/\1/p')
+PASSWORD_CLIENT_ID=$(echo "$PASSWORD_CLIENT" | sed -n 's/.*Client ID[. ]*\([0-9][0-9]*\)[. ]*/\1/p' | tr -d ' ')
+PASSWORD_CLIENT_SECRET=$(echo "$PASSWORD_CLIENT" | sed -n 's/.*Client secret[. ]*\([a-zA-Z0-9]*\)[. ]*/\1/p' | tr -d ' ')
+
+echo "Extracted password client ID: $PASSWORD_CLIENT_ID"
+echo "Extracted password client secret: $PASSWORD_CLIENT_SECRET"
 
 # Verify we got all the credentials
 if [ -z "$PERSONAL_CLIENT_ID" ] || [ -z "$PERSONAL_CLIENT_SECRET" ] || [ -z "$PASSWORD_CLIENT_ID" ] || [ -z "$PASSWORD_CLIENT_SECRET" ]; then
     echo "Error: Failed to extract all required credentials"
+    echo "Debug info:"
+    echo "PERSONAL_CLIENT_ID: ${PERSONAL_CLIENT_ID:-not set}"
+    echo "PERSONAL_CLIENT_SECRET: ${PERSONAL_CLIENT_SECRET:-not set}"
+    echo "PASSWORD_CLIENT_ID: ${PASSWORD_CLIENT_ID:-not set}"
+    echo "PASSWORD_CLIENT_SECRET: ${PASSWORD_CLIENT_SECRET:-not set}"
     exit 1
 fi
 
