@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
-Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+
 
 // Protected routes (require user token)
 Route::middleware('auth:api')->group(function () {
@@ -40,6 +40,7 @@ Route::middleware('auth:api')->group(function () {
 
 // Client credentials protected routes
 Route::middleware(['client'])->group(function () {
+    Route::post('/register', [AuthController::class, 'register'])->name('api.register');
     Route::apiResource('users', UserController::class);
     Route::apiResource('attributes', AttributeController::class);
 });
