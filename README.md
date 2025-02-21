@@ -1,66 +1,350 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Time Management API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel-based REST API for managing users, projects, and timesheets. This API provides authentication using Laravel Passport with both client credentials and user token support.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- User Authentication (Login/Register/Logout)
+- Client Credentials for Service-level Access
+- User Token for Individual Access
+- CRUD Operations for Users, Projects, and Timesheets
+- Role-based Access Control
+- API Resource Responses
+- Request Validation
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Composer
+- MySQL 8.0+
+- Laravel 11.x
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd astudio-assesment-alihabib
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. Install dependencies:
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Copy environment file and configure your database:
+```bash
+cp .env.example .env
+```
 
-## Laravel Sponsors
+4. Generate application key:
+```bash
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Run migrations:
+```bash
+php artisan migrate
+```
 
-### Premium Partners
+6. Install Passport:
+```bash
+php artisan passport:install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## API Documentation
 
-## Contributing
+### Obtaining Access Tokens
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### Client Credentials Token
+```
+POST /oauth/token
+Content-Type: application/json
 
-## Code of Conduct
+{
+    "grant_type": "client_credentials",
+    "client_id": "your_client_id",
+    "client_secret": "your_client_secret",
+    "scope": "*"
+}
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Response: 200 OK
+{
+    "token_type": "Bearer",
+    "expires_in": 31536000,
+    "access_token": "eyJ0eXAiOiJKV1..."
+}
 
-## Security Vulnerabilities
+Error Response: 401 Unauthorized
+{
+    "error": "invalid_client",
+    "error_description": "Client authentication failed",
+    "message": "Client authentication failed"
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Authentication Endpoints
+
+#### Register
+```
+POST /api/register
+Content-Type: application/json
+X-Client-Secret: PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET
+
+{
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "password": "string"
+}
+
+Response: 201 Created
+{
+    "message": "User registered successfully",
+    "user": {
+        "id": integer,
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "full_name": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    },
+    "access_token": "string"
+}
+
+Error Response: 422 Unprocessable Entity
+{
+    "message": "The given data was invalid.",
+    "errors": {
+        "email": [
+            "The email has already been taken."
+        ],
+        "password": [
+            "The password must be at least 8 characters."
+        ]
+    }
+}
+
+Error Response: 401 Unauthorized
+{
+    "message": "Invalid client secret"
+}
+```
+
+#### Login
+```
+POST /api/login
+Content-Type: application/json
+
+{
+    "email": "string",
+    "password": "string"
+}
+
+Response: 200 OK
+{
+    "message": "Login successful",
+    "user": {
+        "id": integer,
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "full_name": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    },
+    "access_token": "string"
+}
+
+Error Response: 401 Unauthorized
+{
+    "message": "Invalid credentials.",
+    "errors": {
+        "email": ["The provided email is not registered."],
+        "password": ["The provided password is incorrect."]
+    }
+}
+```
+
+### User Management Endpoints
+
+#### List Users (Client Credentials Required)
+```
+GET /api/users
+Authorization: Bearer {client-token}
+
+Response: 200 OK
+{
+    "data": [
+        {
+            "id": integer,
+            "first_name": "string",
+            "last_name": "string",
+            "email": "string",
+            "full_name": "string",
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        }
+    ],
+    "links": {},
+    "meta": {}
+}
+
+Error Response: 401 Unauthorized
+{
+    "message": "Unauthenticated."
+}
+
+Error Response: 403 Forbidden
+{
+    "message": "Invalid scope"
+}
+```
+
+#### Get Current User (User Token Required)
+```
+GET /api/users/me
+Authorization: Bearer {user-token}
+
+Response: 200 OK
+{
+    "data": {
+        "id": integer,
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "full_name": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### Create User (Client Credentials Required)
+```
+POST /api/users
+Authorization: Bearer {client-token}
+Content-Type: application/json
+
+{
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "password": "string"
+}
+
+Response: 201 Created
+{
+    "message": "User created successfully",
+    "data": {
+        "id": integer,
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "full_name": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### Update User (Client Credentials Required)
+```
+PUT /api/users/{id}
+Authorization: Bearer {client-token}
+Content-Type: application/json
+
+{
+    "first_name": "string",
+    "last_name": "string",
+    "email": "string",
+    "password": "string"
+}
+
+Response: 200 OK
+{
+    "message": "User updated successfully",
+    "data": {
+        "id": integer,
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "full_name": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+```
+
+#### Delete User (Client Credentials Required)
+```
+DELETE /api/users/{id}
+Authorization: Bearer {client-token}
+
+Response: 200 OK
+{
+    "message": "User deleted successfully"
+}
+```
+
+## Authentication Types
+
+### Client Credentials (Service Token)
+Used for service-level operations. To obtain a client credentials token:
+
+1. Create a client:
+```bash
+php artisan passport:client --client
+```
+
+2. Request a token:
+```bash
+curl -X POST http://your-domain/oauth/token \
+    -H "Content-Type: application/json" \
+    -d '{
+        "grant_type": "client_credentials",
+        "client_id": "your_client_id",
+        "client_secret": "your_client_secret",
+        "scope": "*"
+    }'
+```
+
+### User Token
+Used for user-specific operations. Obtained by:
+1. Registering via `/api/register` (requires `X-Client-Secret` header)
+2. Logging in via `/api/login`
+
+## Error Handling
+
+The API returns appropriate HTTP status codes:
+
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 422: Validation Error
+- 500: Server Error
+
+Error responses follow this format:
+```json
+{
+    "message": "Error message here",
+    "errors": {
+        "field": ["Error description"]
+    }
+}
+```
+
+## Testing
+
+Run the test suite:
+```bash
+php artisan test
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
