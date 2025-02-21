@@ -332,7 +332,30 @@ Response: 200 OK
 }
 ```
 
-### Attributes Management (Client Credentials Required)
+### Users Response Format
+```json
+{
+    "data": {
+        "id": 1,
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "john@example.com",
+        "full_name": "John Doe",
+        "created_at": "2024-02-21T10:00:00.000000Z",
+        "updated_at": "2024-02-21T10:00:00.000000Z"
+    }
+}
+```
+
+### Create/Update User Request
+```json
+{
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john@example.com",
+    "password": "secure_password"  // Only for create or password update
+}
+```
 
 #### List Attributes
 ```
@@ -688,6 +711,42 @@ The filtering system uses a combination of regular database columns and EAV patt
 
 ## Projects Management (User Token Required)
 
+### Projects Response Format
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Project Alpha",
+        "status": "completed",
+        "attributes": [
+            {
+                "id": 1,
+                "attribute": {
+                    "id": 1,
+                    "name": "Department",
+                    "key": "department"
+                },
+                "value": "Marketing"
+            }
+        ],
+        "created_at": "2024-02-21T10:00:00.000000Z",
+        "updated_at": "2024-02-21T10:00:00.000000Z"
+    }
+}
+```
+
+### Create/Update Project Request
+```json
+{
+    "name": "Project Alpha",
+    "status": "completed",
+    "attributes": {
+        "department": "Marketing",
+        "start_date": "2024-02-21"
+    }
+}
+```
+
 #### List Projects
 ```
 GET /api/projects
@@ -711,7 +770,10 @@ Response: 200 OK
                     "id": 1,
                     "first_name": "John",
                     "last_name": "Doe",
-                    "email": "john@example.com"
+                    "email": "john@example.com",
+                    "full_name": "John Doe",
+                    "created_at": "timestamp",
+                    "updated_at": "timestamp"
                 }
             ],
             "attribute_values": [
@@ -773,7 +835,10 @@ Response: 200 OK
                 "id": 1,
                 "first_name": "John",
                 "last_name": "Doe",
-                "email": "john@example.com"
+                "email": "john@example.com",
+                "full_name": "John Doe",
+                "created_at": "timestamp",
+                "updated_at": "timestamp"
             }
         ],
         "attribute_values": [
@@ -1064,4 +1129,3 @@ Common error codes:
 - 404: Resource not found
 - 422: Validation error
 - 500: Server error
-

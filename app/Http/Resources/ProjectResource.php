@@ -17,8 +17,7 @@ class ProjectResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'status_id' => $this->status_id,
-            'status' => new ProjectStatusResource($this->whenLoaded('status')),
+            'status' => $this->status->slug,
             'users' => UserResource::collection($this->whenLoaded('users')),
             'attribute_values' => AttributeValueResource::collection($this->whenLoaded('attributeValues')),
             'created_at' => $this->created_at,
