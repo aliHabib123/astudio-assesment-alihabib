@@ -82,10 +82,25 @@ class ProjectController extends Controller
     /**
      * Display a listing of the projects.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
-        $projects = Auth::user()->projects()->paginate();
-        return ProjectResource::collection($projects);
+        $query = Project::query();
+
+        // Apply filters if present
+        if ($request->has('filters')) {
+            $query->filter($request->input('filters'));
+        }
+
+        // Get projects for the authenticated user through the relationship
+        $query->whereHas('users', function($q) {
+            $q->where('users.id', Auth::id());
+        });
+
+        $projects = $query->paginate();
+
+        return response()->json([
+            'data' => ProjectResource::collection($projects)
+        ]);
     }
 
     /**
@@ -118,12 +133,12 @@ class ProjectController extends Controller
 
             // Get status_id from slug
             $status = ProjectStatus::where('slug', $request->status)->firstOrFail();
-            
+
             $project = Project::create([
                 'name' => $request->name,
                 'status_id' => $status->id,
             ]);
-            
+
             // Assign users to project
             if ($request->has('user_ids')) {
                 $project->users()->sync($request->user_ids);

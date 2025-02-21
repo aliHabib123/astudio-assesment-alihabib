@@ -11,6 +11,7 @@ A Laravel-based REST API for managing users, projects, and timesheets. This API 
 - Role-based Access Control
 - API Resource Responses
 - Request Validation
+- Advanced Filtering System
 
 ## Requirements
 
@@ -570,6 +571,117 @@ The following types are supported for attributes:
 - `date`: For date input
 - `number`: For numeric input
 - `select`: For dropdown selection (requires options array)
+
+## Filtering
+
+The API supports filtering on both regular fields and EAV (Entity-Attribute-Value) attributes. You can apply filters using query parameters in the following format:
+
+```
+GET /api/projects?filters[field:operator]=value
+```
+
+### Available Operators
+
+- `eq` - Equals (default if no operator specified)
+- `gt` - Greater than
+- `lt` - Less than
+- `gte` - Greater than or equal to
+- `lte` - Less than or equal to
+- `like` - Contains (case-insensitive)
+- `not` - Not equal to
+
+### Examples
+
+1. Basic equality filter:
+```
+GET /api/projects?filters[name]=ProjectA
+```
+
+2. Using LIKE operator:
+```
+GET /api/projects?filters[name:like]=Project
+```
+
+3. Multiple filters:
+```
+GET /api/projects?filters[name]=ProjectA&filters[department]=IT
+```
+
+4. Date range filter:
+```
+GET /api/projects?filters[start_date:gte]=2024-01-01&filters[end_date:lte]=2024-12-31
+```
+
+### Filterable Fields
+
+#### Regular Fields
+- name
+- status_id
+- created_at
+- updated_at
+- deleted_at
+
+#### EAV Attributes
+- department
+- priority
+- client
+- budget
+
+## Advanced Filtering System
+
+The API supports filtering both regular database fields and Entity-Attribute-Value (EAV) attributes:
+
+#### Regular Fields
+- `name`
+- `status_id`
+- `created_at`
+- `updated_at`
+- `deleted_at`
+
+#### Dynamic EAV Attributes
+Filters are dynamically loaded from the attributes table based on the attribute `key`. Common examples include:
+- `department`
+- `start_date`
+- `end_date`
+- `user_role`
+
+### Filter Operators
+
+The following operators are supported for all filters:
+- `eq` (equals, default if not specified)
+- `gt` (greater than)
+- `lt` (less than)
+- `gte` (greater than or equal)
+- `lte` (less than or equal)
+- `like` (contains)
+- `not` (not equal)
+
+## Usage Examples
+
+### Basic Filtering
+```http
+GET /api/projects?filters[name]=Project Alpha
+GET /api/projects?filters[department]=Marketing
+```
+
+### Using Operators
+```http
+GET /api/projects?filters[created_at:gt]=2024-01-01
+GET /api/projects?filters[name:like]=Alpha
+GET /api/projects?filters[department:not]=Sales
+```
+
+### Multiple Filters
+```http
+GET /api/projects?filters[department]=Marketing&filters[start_date:gt]=2024-01-01
+```
+
+## Implementation Details
+
+The filtering system uses a combination of regular database columns and EAV pattern:
+- Regular fields are filtered directly on the projects table
+- EAV attributes are filtered through a subquery joining attributes and attribute_values tables
+- Attribute keys are used for filtering instead of display names for consistency
 
 ## Projects Management (User Token Required)
 
