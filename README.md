@@ -101,12 +101,12 @@ The Postman collection includes automated scripts for token management:
 
 1. When calling `/oauth/token` (Password Grant):
    - The access token is automatically extracted from the response
-   - Stored in the collection variable `access_token`
+   - Stored in the collection variable `client_credential_token`
    - Used for subsequent authenticated requests
 
 2. When calling `/api/login` (User Login):
    - The user token is automatically extracted from the response
-   - Stored in the collection variable `access_token`
+   - Stored in the collection variable `bearer_token`
    - Used for subsequent authenticated requests
 
 This automation means you don't need to manually copy and paste tokens between requests - just execute the authentication endpoints and the tokens will be automatically set for the entire collection.
