@@ -1,13 +1,13 @@
 # Time Management API
 
-A Laravel-based REST API for managing users, projects, and timesheets. This API provides authentication using Laravel Passport with both client credentials and user token support.
+A Laravel-based REST API for managing users, projects, EAV attributes, and timesheets. This API provides authentication using Laravel Passport with both client credentials and user token support.
 
 ## Features
 
 - User Authentication (Login/Register/Logout)
 - Client Credentials for Service-level Access
 - User Token for Individual Access
-- CRUD Operations for Users, Projects, and Timesheets
+- CRUD Operations for Users, Projects, Attributes, and Timesheets
 - Role-based Access Control
 - API Resource Responses
 - Request Validation
@@ -24,7 +24,7 @@ A Laravel-based REST API for managing users, projects, and timesheets. This API 
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/aliHabib123/astudio-assesment-alihabib
 cd astudio-assesment-alihabib
 ```
 
@@ -55,11 +55,14 @@ php artisan passport:install
 
 ## API Endpoints
 
+## Oauth
+
+- `POST /oauth/token` - Get access token (requires client credentials)
+
 ### Authentication
+- `POST /api/register` - Register a new user (requires oauth access token)
 - `POST /api/login` - Login and get access token
-- `POST /api/register` - Register a new user
 - `POST /api/logout` - Logout (requires authentication)
-- `GET /api/user` - Get current user info (requires authentication)
 
 ### Users (requires authentication)
 - `GET /api/users/me` - Get current user's profile
@@ -1019,36 +1022,46 @@ Used for user-specific operations. Obtained by:
 1. Registering via `/api/register` (requires `X-Client-Secret` header)
 2. Logging in via `/api/login`
 
+## Authentication Flow
+
+The API uses a two-tier authentication system:
+
+### 1. Client Credentials (Service Level)
+Required for:
+- User Registration (`POST /api/register`)
+- User Management (`/api/users/*`)
+- Attribute Management (`/api/attributes/*`)
+
+To access these endpoints:
+1. Obtain a client credentials token using your client ID and secret
+2. Use the token in the Authorization header: `Bearer <token>`
+
+### 2. User Token (Individual Level)
+Required for:
+- Project Management (`/api/projects/*`)
+- Timesheet Management (`/api/timesheets/*`)
+- User Profile Operations (`/api/users/me`)
+
+To access these endpoints:
+1. Login to obtain a user token
+2. Use the token in the Authorization header: `Bearer <token>`
+
 ## Error Handling
 
-The API returns appropriate HTTP status codes:
+The API provides consistent error responses:
 
-- 200: Success
-- 201: Created
-- 400: Bad Request
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not Found
-- 422: Validation Error
-- 500: Server Error
-
-Error responses follow this format:
 ```json
 {
-    "message": "Error message here",
-    "errors": {
-        "field": ["Error description"]
-    }
+    "status": "error",
+    "message": "Descriptive error message",
+    "code": 4xx
 }
 ```
 
-## Testing
+Common error codes:
+- 401: Unauthorized (invalid or missing token)
+- 403: Forbidden (insufficient permissions)
+- 404: Resource not found
+- 422: Validation error
+- 500: Server error
 
-Run the test suite:
-```bash
-php artisan test
-```
-
-## License
-
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
