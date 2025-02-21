@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AttributeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,13 +24,14 @@ Route::post('/register', [AuthController::class, 'register'])->name('api.registe
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', [AuthController::class, 'user'])->name('api.user');
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
-    
+
     // User self-management routes (must come before the resource routes)
     Route::get('/users/me', [UserController::class, 'showSelf']);
     Route::put('/users/me', [UserController::class, 'updateSelf']);
 });
 
 // Client credentials protected routes
-Route::middleware('client')->group(function () {
+Route::middleware(['client'])->group(function () {
     Route::apiResource('users', UserController::class);
+    Route::apiResource('attributes', AttributeController::class);
 });
