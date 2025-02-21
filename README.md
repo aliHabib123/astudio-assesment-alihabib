@@ -38,20 +38,81 @@ composer install
 cp .env.example .env
 ```
 
-4. Generate application key:
+4. Update .env file with your database credentials:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+5. Generate application key:
 ```bash
 php artisan key:generate
 ```
 
-5. Run migrations:
+6. Run migrations:
 ```bash
 php artisan migrate
 ```
 
-6. Install Passport:
+7. Set up Passport and configure credentials:
 ```bash
-php artisan passport:install
+# Make the setup script executable
+chmod +x setup-passport.sh
+
+# Run the setup script
+./setup-passport.sh
 ```
+
+8. Seed the database with sample data (optional):
+```bash
+php artisan db:seed
+```
+
+This will create:
+- Default project statuses (New, In Progress, Completed, On Hold)
+- Sample attributes (Department, Start Date, End Date, User Role)
+- 10 random users
+- A test user (email: test@example.com)
+- 10 sample projects with random attributes
+
+9. Start the development server:
+```bash
+php artisan serve
+```
+
+## Verifying Installation
+
+To verify that everything is set up correctly:
+
+1. Check if the API is running:
+```bash
+curl http://localhost:8000/api/health
+```
+
+2. Try logging in with the test user:
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password"}'
+```
+
+3. Get an OAuth client credentials token:
+```bash
+curl -X POST http://localhost:8000/oauth/token \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type": "client_credentials",
+    "client_id": "'$PASSPORT_PASSWORD_GRANT_CLIENT_ID'",
+    "client_secret": "'$PASSPORT_PASSWORD_GRANT_CLIENT_SECRET'",
+    "scope": "*"
+  }'
+```
+
+If all these requests work, your installation is complete and working correctly!
 
 ## API Endpoints
 

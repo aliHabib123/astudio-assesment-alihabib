@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,14 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ProjectStatusSeeder::class,
             AttributeSeeder::class,
-        ]);
-
-        User::factory(10)->create();
-
-        User::factory()->create([
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'email' => 'test@example.com',
+            UserSeeder::class,
+            ProjectSeeder::class, // Add projects last since they depend on other models
         ]);
     }
 }
