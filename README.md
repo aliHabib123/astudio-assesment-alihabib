@@ -52,6 +52,46 @@ php artisan migrate
 php artisan passport:install
 ```
 
+## API Endpoints
+
+### Authentication
+- `POST /api/login` - Login and get access token
+- `POST /api/register` - Register a new user
+- `POST /api/logout` - Logout (requires authentication)
+- `GET /api/user` - Get current user info (requires authentication)
+
+### Users (requires authentication)
+- `GET /api/users/me` - Get current user's profile
+- `PUT /api/users/me` - Update current user's profile
+
+### Users (requires client credentials)
+- `GET /api/users` - List all users
+- `POST /api/users` - Create a new user
+- `GET /api/users/{id}` - Get user details
+- `PUT /api/users/{id}` - Update user
+- `DELETE /api/users/{id}` - Delete user
+
+### Projects (requires authentication)
+- `GET /api/projects` - List all projects
+- `POST /api/projects` - Create a new project
+- `GET /api/projects/{id}` - Get project details
+- `PUT /api/projects/{id}` - Update project
+- `DELETE /api/projects/{id}` - Delete project
+
+### Timesheets (requires authentication)
+- `GET /api/timesheets` - List all timesheets
+- `POST /api/timesheets` - Create a new timesheet entry
+- `GET /api/timesheets/{id}` - Get timesheet details
+- `PUT /api/timesheets/{id}` - Update timesheet
+- `DELETE /api/timesheets/{id}` - Delete timesheet
+
+### Attributes (requires client credentials)
+- `GET /api/attributes` - List all attributes
+- `POST /api/attributes` - Create a new attribute
+- `GET /api/attributes/{id}` - Get attribute details
+- `PUT /api/attributes/{id}` - Update attribute
+- `DELETE /api/attributes/{id}` - Delete attribute
+
 ## API Documentation
 
 ### Obtaining Access Tokens
