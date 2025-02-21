@@ -115,19 +115,15 @@ This automation means you don't need to manually copy and paste tokens between r
 
 To verify that everything is set up correctly:
 
-1. Check if the API is running:
-```bash
-curl http://localhost:8000/api/health
-```
-
-2. Try logging in with the test user:
+1. Try logging in with the test user:
 ```bash
 curl -X POST http://localhost:8000/api/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password"}'
 ```
+You should receive a 401 response, indicating the API is running but the credentials are incorrect.
 
-3. Get an OAuth client credentials token:
+2. Get an OAuth client credentials token:
 ```bash
 curl -X POST http://localhost:8000/oauth/token \
   -H "Content-Type: application/json" \
