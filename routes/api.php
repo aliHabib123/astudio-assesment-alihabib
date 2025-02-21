@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AttributeController;
+use App\Http\Controllers\Api\ProjectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,9 @@ Route::middleware('auth:api')->group(function () {
     // User self-management routes (must come before the resource routes)
     Route::get('/users/me', [UserController::class, 'showSelf']);
     Route::put('/users/me', [UserController::class, 'updateSelf']);
+
+    // Project routes
+    Route::apiResource('projects', ProjectController::class);
 });
 
 // Client credentials protected routes

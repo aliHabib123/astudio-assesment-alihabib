@@ -531,6 +531,315 @@ The following types are supported for attributes:
 - `number`: For numeric input
 - `select`: For dropdown selection (requires options array)
 
+## Projects Management (User Token Required)
+
+#### List Projects
+```
+GET /api/projects
+Authorization: Bearer {user-token}
+
+Response: 200 OK
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "Project Alpha",
+            "status": {
+                "id": 1,
+                "name": "In Progress",
+                "slug": "in-progress",
+                "color": "#FFA500",
+                "order": 2
+            },
+            "users": [
+                {
+                    "id": 1,
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "email": "john@example.com"
+                }
+            ],
+            "attribute_values": [
+                {
+                    "id": 1,
+                    "attribute_id": 1,
+                    "value": "2025-03-01",
+                    "attribute": {
+                        "id": 1,
+                        "name": "Start Date",
+                        "key": "start_date",
+                        "type": "date"
+                    }
+                }
+            ],
+            "created_at": "timestamp",
+            "updated_at": "timestamp"
+        }
+    ],
+    "links": {
+        "first": "http://example.com/api/projects?page=1",
+        "last": "http://example.com/api/projects?page=1",
+        "prev": null,
+        "next": null
+    },
+    "meta": {
+        "current_page": 1,
+        "last_page": 1,
+        "per_page": 15,
+        "total": 1
+    }
+}
+
+Error Response: 401 Unauthorized
+{
+    "message": "Unauthenticated."
+}
+```
+
+#### Get Single Project
+```
+GET /api/projects/{id}
+Authorization: Bearer {user-token}
+
+Response: 200 OK
+{
+    "data": {
+        "id": 1,
+        "name": "Project Alpha",
+        "status": {
+            "id": 1,
+            "name": "In Progress",
+            "slug": "in-progress",
+            "color": "#FFA500",
+            "order": 2
+        },
+        "users": [
+            {
+                "id": 1,
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john@example.com"
+            }
+        ],
+        "attribute_values": [
+            {
+                "id": 1,
+                "attribute_id": 1,
+                "value": "2025-03-01",
+                "attribute": {
+                    "id": 1,
+                    "name": "Start Date",
+                    "key": "start_date",
+                    "type": "date"
+                }
+            }
+        ],
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 403 Forbidden
+{
+    "message": "Unauthorized to view this project"
+}
+
+Error Response: 404 Not Found
+{
+    "message": "No query results for model [App\\Models\\Project]."
+}
+```
+
+#### Create Project
+```
+POST /api/projects
+Authorization: Bearer {user-token}
+Content-Type: application/json
+
+{
+    "name": "New Project",
+    "status": "in-progress",
+    "user_ids": [1, 2],
+    "attribute_values": [
+        {
+            "key": "start_date",
+            "value": "2025-03-01"
+        },
+        {
+            "key": "priority",
+            "value": "high"
+        },
+        {
+            "key": "budget",
+            "value": "10000.50"
+        },
+        {
+            "key": "description",
+            "value": "Project description"
+        }
+    ]
+}
+
+Response: 201 Created
+{
+    "data": {
+        "id": 1,
+        "name": "New Project",
+        "status": {
+            "id": 1,
+            "name": "In Progress",
+            "slug": "in-progress",
+            "color": "#FFA500",
+            "order": 2
+        },
+        "users": [...],
+        "attribute_values": [...],
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 422 Unprocessable Entity
+{
+    "errors": {
+        "name": [
+            "The name field is required."
+        ],
+        "status": [
+            "The selected status is invalid."
+        ],
+        "attribute_values.0.value": [
+            "The value must be a valid date."
+        ],
+        "attribute_values.1.value": [
+            "The selected value is invalid."
+        ]
+    }
+}
+```
+
+#### Update Project
+```
+PUT /api/projects/{id}
+Authorization: Bearer {user-token}
+Content-Type: application/json
+
+{
+    "name": "Updated Project",
+    "status": "completed",
+    "user_ids": [1, 2, 3],
+    "attribute_values": [
+        {
+            "key": "completion_date",
+            "value": "2025-04-01"
+        }
+    ]
+}
+
+Response: 200 OK
+{
+    "data": {
+        "id": 1,
+        "name": "Updated Project",
+        "status": {
+            "id": 2,
+            "name": "Completed",
+            "slug": "completed",
+            "color": "#00FF00",
+            "order": 3
+        },
+        "users": [...],
+        "attribute_values": [...],
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 403 Forbidden
+{
+    "message": "Unauthorized to update this project"
+}
+
+Error Response: 422 Unprocessable Entity
+{
+    "errors": {
+        "status": [
+            "The selected status is invalid."
+        ],
+        "attribute_values.0.value": [
+            "The value must be a valid date."
+        ]
+    }
+}
+```
+
+#### Delete Project
+```
+DELETE /api/projects/{id}
+Authorization: Bearer {user-token}
+
+Response: 200 OK
+{
+    "message": "Project deleted successfully",
+    "data": {
+        "id": 1,
+        "name": "Project Alpha",
+        "status": {...},
+        "users": [...],
+        "attribute_values": [...],
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+    }
+}
+
+Error Response: 403 Forbidden
+{
+    "message": "Unauthorized to delete this project"
+}
+```
+
+#### Attribute Value Types and Validation
+When creating or updating projects, attribute values are validated based on their type:
+
+1. **Text Type**
+   ```json
+   {
+       "key": "description",
+       "value": "Any text value"
+   }
+   ```
+
+2. **Number Type**
+   ```json
+   {
+       "key": "budget",
+       "value": "1000.50"  // Must be a valid number
+   }
+   ```
+
+3. **Date Type**
+   ```json
+   {
+       "key": "start_date",
+       "value": "2025-02-21"  // Must be a valid date
+   }
+   ```
+
+4. **Select Type**
+   ```json
+   {
+       "key": "priority",
+       "value": "high"  // Must be one of the predefined options
+   }
+   ```
+
+Notes:
+- The creating user is automatically added as a project member
+- Users can only access projects they are members of
+- All attribute values are validated against their defined type
+- For select-type attributes, values must match one of the predefined options
+- The current user cannot be removed from the project's user list
+
 ## Authentication Types
 
 ### Client Credentials (Service Token)
