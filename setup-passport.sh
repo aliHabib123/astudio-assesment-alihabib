@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Install Passport
-php artisan passport:install
+# Check if Passport tables exist
+if php artisan migrate:status | grep -q "oauth_auth_codes"; then
+    echo "Passport tables already exist. Skipping migration..."
+else
+    echo "Installing Passport tables..."
+    php artisan passport:install
+fi
 
-# Get the client IDs and secrets
+# Get the client IDs and secrets (this will work whether tables existed or not)
 PERSONAL_CLIENT_ID=$(php artisan passport:client --personal --no-interaction --quiet | grep -oP 'Client ID: \K[0-9]+')
 PERSONAL_CLIENT_SECRET=$(php artisan passport:client --personal --no-interaction --quiet | grep -oP 'Client secret: \K[^\n]+')
 
