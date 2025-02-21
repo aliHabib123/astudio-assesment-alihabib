@@ -471,6 +471,59 @@ Error Response: 404 Not Found
 }
 ```
 
+#### Example Attribute Payloads
+
+1. Select Type with Options
+```json
+POST /api/attributes
+Authorization: Bearer {client-token}
+Content-Type: application/json
+
+{
+    "name": "User Role",
+    "key": "user_role",
+    "type": "select",
+    "options": ["admin", "manager", "user", "guest"],
+    "default_value": "user",
+    "description": "Role assigned to the user"
+}
+```
+
+2. Date Type
+```json
+{
+    "name": "Birth Date",
+    "key": "birth_date",
+    "type": "date",
+    "default_value": "1990-01-01",
+    "description": "User's date of birth"
+}
+```
+
+3. Number Type
+```json
+{
+    "name": "Age",
+    "key": "age",
+    "type": "number",
+    "default_value": "18",
+    "description": "User's age"
+}
+```
+
+4. Text Type
+```json
+{
+    "name": "Address",
+    "key": "address",
+    "type": "text",
+    "default_value": "",
+    "description": "User's residential address"
+}
+```
+
+Note: The `options` field is only required and used when `type` is set to `select`. For other types, you can omit this field or set it to `null`.
+
 #### Attribute Types
 The following types are supported for attributes:
 - `text`: For text/string input
